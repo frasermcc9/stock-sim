@@ -1,0 +1,1 @@
+{"version":3,"file":"sharesStatics.d.ts","sourceRoot":"","sources":["../../../../src/database/shares/sharesStatics.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,WAAW,EAAE,MAAM,eAAe,CAAC;AAG5D,wBAAsB,eAAe,CAAC,IAAI,EAAE,WAAW,EAAE,EAAE,GAAG,EAAE,MAAM,EAAE,EAAE;IAAE,GAAG,EAAE,MAAM,CAAC;IAAC,MAAM,EAAE,MAAM,CAAA;CAAE,GAAG,OAAO,CAAC,cAAc,CAAC,CAOlI"}

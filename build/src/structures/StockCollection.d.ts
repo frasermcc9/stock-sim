@@ -1,0 +1,1 @@
+//# sourceMappingURL=StockCollection.d.ts.map

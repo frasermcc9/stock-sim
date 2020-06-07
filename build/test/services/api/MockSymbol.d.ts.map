@@ -1,0 +1,1 @@
+{"version":3,"file":"MockSymbol.d.ts","sourceRoot":"","sources":["../../../../test/services/api/MockSymbol.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,WAAW,EAAE,MAAM,uCAAuC,CAAC;AAEpE,qBAAa,UAAW,SAAQ,WAAW;IAC1C,OAAO,CAAC,OAAO,CAAS;gBACZ,MAAM,EAAE,MAAM;IAInB,YAAY,IAAI,EAAE;IAGlB,SAAS,IAAI,IAAI;IACjB,cAAc,IAAI,IAAI;IACtB,WAAW;CAClB"}
