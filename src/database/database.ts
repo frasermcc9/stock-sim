@@ -1,11 +1,14 @@
 import Mongoose = require("mongoose");
 import { UserModel } from "./users/usersModel";
+import { Client } from "../Client";
 
 let database: Mongoose.Connection;
 
 export const connect = () => {
-	const uri = "mongodb://localhost:27017";
-	const dbName = "stocksim";
+	//const uri = "mongodb://localhost:27017";
+	const uri = Client.getClient().uri;
+	//const dbName = "stocksim";
+	const dbName = Client.getClient().dbName;
 
 	if (database) {
 		return;
