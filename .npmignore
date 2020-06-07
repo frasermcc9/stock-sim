@@ -1,0 +1,9 @@
+/test
+/src
+/node_modules
+/.vscode
+auth.json
+.eslintrc.json
+testy.json
+tsconfig.json
+.gitignore
