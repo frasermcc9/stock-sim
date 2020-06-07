@@ -1,29 +1,36 @@
-import { Test, TestSuite, expect, BeforeAll, BeforeEach, beforeAll } from "testyts";
-import { UserModel } from "../../src/database/users/usersModel";
-import { connect, disconnect } from "../../src/database/database";
+import Mongoose = require("mongoose");
 
-@TestSuite()
-export class TestDatabase {
-	private users = [
-		{ uId: "111", capital: 1000 },
-		{ uId: "112", capital: 500 },
-		{ uId: "113", capital: 1000 },
-		{ uId: "114", capital: 500 },
-		{ uId: "115", capital: 1000 },
-		{ uId: "116", capital: 500 },
-		{ uId: "117", capital: 1000 },
-	];
+let database: Mongoose.Connection;
 
-	@Test("Adding users")
-	async testAddingRegistries() {
-		connect();
-		try {
-			for (const user of this.users) {
-				await UserModel.create(user);
-			}
-			disconnect();
-		} catch (e) {
-			console.error(e);
-		}
+export const connect = () => {
+	const uri = "mongodb://localhost:27017";
+	const dbName = "stocksimTest";
+
+	if (database) {
+		return;
 	}
-}
+
+	Mongoose.connect(uri, {
+		useNewUrlParser: true,
+		useFindAndModify: true,
+		useUnifiedTopology: true,
+		useCreateIndex: true,
+		dbName: dbName,
+	});
+	database = Mongoose.connection;
+
+	database.once("open", async () => {
+		console.log("Connected to database");
+	});
+
+	database.on("error", () => {
+		console.log("Error connecting to database");
+	});
+};
+
+export const disconnect = () => {
+	if (!database) {
+		return;
+	}
+	Mongoose.disconnect();
+};
