@@ -13,7 +13,6 @@
 	"author": "Fraser McCallum",
 	"license": "ISC",
 	"dependencies": {
-		"express": "^4.17.1",
 		"mongoose": "^5.9.18",
 		"node-fetch": "^2.6.0",
 		"node-iex-cloud": "^2.0.1"
