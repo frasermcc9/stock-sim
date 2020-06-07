@@ -1,14 +1,7 @@
-import { connect } from "./database/database";
-import { Client } from "./Client";
+export { Crypto } from "./services/api/Crypto";
+export { Symbol } from "./services/api/Symbol";
+export { UserAction } from "./services/local/UserAction";
+export { connect } from "./database/database";
+export { Client } from "./Client";
 
-import * as auth from "../auth.json";
 
-Client.CreateClient({
-	dbName: "stocksimTest",
-	iexKey: auth.iexKey,
-	uri: auth.uri,
-	marketHoursOnly: false,
-	newUserValue: 1000,
-});
-
-connect();
