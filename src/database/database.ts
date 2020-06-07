@@ -29,12 +29,17 @@ export const connect = () => {
 
 	database.on("error", () => {
 		console.log("Error connecting to database");
-	});
+    });
+    
+	return {
+		UserModel,
+	};
 };
 
 export const disconnect = () => {
 	if (!database) {
 		return;
 	}
-	Mongoose.disconnect();
+    Mongoose.disconnect();
+    console.log("Closed database");
 };
