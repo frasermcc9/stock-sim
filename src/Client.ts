@@ -13,7 +13,7 @@ export class Client {
 		if (!this._client) {
 			if (!options.uri) throw new TypeError("Cannot start client without a URI");
 			if (!options.dbName) throw new TypeError("Cannot start client without a database name");
-			if (!options.iexKey) throw new TypeError("Cannot start client without a iex key");
+			if (!options.iexKey) throw new TypeError("Cannot start client without iex key");
 			this._client = new Client();
 			this._client.setOptions(options);
 		}
@@ -22,7 +22,7 @@ export class Client {
 	public static getClient() {
 		if (!this._client) {
 			throw new TypeError("You must explicitly create the client with Client.CreateClient(options: IClientOptions)");
-		}
+        }
 		return this._client;
 	}
 
