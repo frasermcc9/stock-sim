@@ -1,7 +1,7 @@
 import { IUserDocument, IUserModel } from "./usersTypes";
-import { Client } from "../../client";
+import { Client } from "../../Client";
 
-export async function findOneOrCreate(this: IUserModel, id: string): Promise<IUserDocument> {
+export async function findOneOrCreate(this: IUserModel, { id }: { id: string }): Promise<IUserDocument> {
 	const record = await this.findOne({ uId: id });
 	if (record) {
 		return record;

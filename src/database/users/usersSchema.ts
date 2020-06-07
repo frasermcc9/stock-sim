@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 import { findOneOrCreate } from "./userStatics";
-import { setLastUpdated, removeUserCapital } from "./usersMethods";
+import { setLastUpdated, removeUserCapital, addUserCapital } from "./usersMethods";
 
 const UserSchema = new Schema({
 	uId: String,
@@ -16,7 +16,9 @@ const UserSchema = new Schema({
 });
 
 UserSchema.statics.findOneOrCreate = findOneOrCreate;
+
 UserSchema.methods.setLastUpdated = setLastUpdated;
-UserSchema.methods.sameLastName = removeUserCapital;
+UserSchema.methods.removeUserCapital = removeUserCapital;
+UserSchema.methods.addUserCapital = addUserCapital;
 
 export default UserSchema;
