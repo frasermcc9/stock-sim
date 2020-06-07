@@ -5,13 +5,13 @@ import { connect, disconnect } from "../../src/database/database";
 @TestSuite()
 export class TestDatabase {
 	private users = [
-		{ discordId: "111", capital: 1000, shares: new Map<string, number>() },
-		{ discordId: "112", capital: 500, shares: new Map<string, number>() },
-		{ discordId: "113", capital: 1000, shares: new Map<string, number>() },
-		{ discordId: "114", capital: 500, shares: new Map<string, number>() },
-		{ discordId: "115", capital: 1000, shares: new Map<string, number>() },
-		{ discordId: "116", capital: 500, shares: new Map<string, number>() },
-		{ discordId: "117", capital: 1000, shares: new Map<string, number>() },
+		{ uId: "111", capital: 1000 },
+		{ uId: "112", capital: 500 },
+		{ uId: "113", capital: 1000 },
+		{ uId: "114", capital: 500 },
+		{ uId: "115", capital: 1000 },
+		{ uId: "116", capital: 500 },
+		{ uId: "117", capital: 1000 },
 	];
 
 	@Test("Adding users")
