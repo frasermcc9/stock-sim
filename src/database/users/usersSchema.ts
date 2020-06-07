@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { findOneOrCreate } from "./userStatics";
+import { findOneOrCreate } from "./usersStatics";
 import { setLastUpdated, removeUserCapital, addUserCapital } from "./usersMethods";
 
 const UserSchema = new Schema({
