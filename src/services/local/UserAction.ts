@@ -7,6 +7,7 @@ export class UserAction {
 	 * @deprecated
 	 */
 	public static async BuyShares(numOfShares: number, sym: string, userId: string): Promise<boolean> {
+        sym = sym.toUpperCase();
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
 		const success = await data.user.removeUserCapital({ cost: data.symbolCost * numOfShares });
@@ -19,6 +20,7 @@ export class UserAction {
 	}
 
 	public static async BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
+		sym = sym.toUpperCase();
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
 		const success = await data.user.removeUserCapital({ cost: toSpend });
@@ -31,6 +33,7 @@ export class UserAction {
 	}
 
 	public static async SellShares(n: number, sym: string, userId: string): Promise<boolean> {
+        sym = sym.toUpperCase();
 		const promises = await Promise.all([ShareModel.findOneOrCreate({ uId: userId, symbol: sym }), new Symbol(sym).CurrentPrice()]);
 		const data = { shareData: promises[0], symbolCost: promises[1] };
 		const success = await data.shareData.sellShares({ numberOfShares: n });
@@ -43,6 +46,7 @@ export class UserAction {
 	}
 
 	public static async SellAllShares(sym: string, userId: string): Promise<boolean> {
+        sym = sym.toUpperCase();
 		const shareDoc = await ShareModel.findOneOrCreate({ uId: userId, symbol: sym });
 		const shareNum = shareDoc.shares;
 		return this.SellShares(shareNum, sym, userId);
