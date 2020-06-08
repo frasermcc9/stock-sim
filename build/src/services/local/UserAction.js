@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const sharesModel_1 = require("../../database/shares/sharesModel");
 const usersModel_1 = require("../../database/users/usersModel");
 const Symbol_1 = require("../api/Symbol");
-const sharesModel_1 = require("../../database/shares/sharesModel");
 class UserAction {
     static async BuyShares(n, sym, userId) {
         const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
@@ -22,9 +22,9 @@ class UserAction {
         if (success) {
             const sharesInDb = await sharesModel_1.ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
             await sharesInDb.addShares({ numberOfShares: n });
-            return data.symbolCost;
+            return { success: true, price: data.symbolCost };
         }
-        return false;
+        return { success: false, price: data.symbolCost };
     }
     static async SellShares(n, sym, userId) {
         const promises = await Promise.all([sharesModel_1.ShareModel.findOneOrCreate({ uId: userId, symbol: sym }), new Symbol_1.Symbol(sym).CurrentPrice()]);
