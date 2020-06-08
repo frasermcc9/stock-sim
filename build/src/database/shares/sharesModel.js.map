@@ -1,1 +1,1 @@
-{"version":3,"file":"sharesModel.js","sourceRoot":"","sources":["../../../../src/database/shares/sharesModel.ts"],"names":[],"mappings":";;;;;AAAA,uCAAiC;AAEjC,kEAAwC;AAC3B,QAAA,UAAU,GAAG,gBAAK,CAAiB,MAAM,EAAE,sBAAU,CAAgB,CAAC"}
+{"version":3,"file":"sharesModel.js","sourceRoot":"","sources":["../../../../src/database/shares/sharesModel.ts"],"names":[],"mappings":";;;;;AAAA,uCAAiC;AAEjC,kEAAyC;AAC5B,QAAA,UAAU,GAAG,gBAAK,CAAiB,QAAQ,EAAE,sBAAW,CAAgB,CAAC"}
