@@ -1,6 +1,4 @@
 import { UserModel } from "../../database/users/usersModel";
-import { IUserDocument } from "../../database/users/usersTypes";
-import { Model } from "mongoose";
 import { Symbol } from "../api/Symbol";
 import { ShareModel } from "../../database/shares/sharesModel";
 
@@ -13,6 +11,18 @@ export class UserAction {
 			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
 			await sharesInDb.addShares({ numberOfShares: n });
 			return true;
+		}
+		return false;
+	}
+
+	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<boolean | number> {
+		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
+		const data = { user: promises[0], symbolCost: promises[1] };
+		const success = await data.user.removeUserCapital({ cost: data.symbolCost * n });
+		if (success) {
+			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
+			await sharesInDb.addShares({ numberOfShares: n });
+			return data.symbolCost;
 		}
 		return false;
 	}
