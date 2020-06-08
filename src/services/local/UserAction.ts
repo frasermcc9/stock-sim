@@ -15,7 +15,7 @@ export class UserAction {
 		return false;
 	}
 
-	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<boolean | number> {
+	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<false | number> {
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
 		const success = await data.user.removeUserCapital({ cost: data.symbolCost * n });
