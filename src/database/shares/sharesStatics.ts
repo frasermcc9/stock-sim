@@ -1,5 +1,4 @@
 import { IShareDocument, IShareModel } from "./sharesTypes";
-import { Client } from "../../Client";
 
 export async function findOneOrCreate(this: IShareModel, { uId, symbol }: { uId: string; symbol: string }): Promise<IShareDocument> {
 	const record = await this.findOne({ uId: uId, symbol: symbol });
