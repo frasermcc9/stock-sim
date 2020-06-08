@@ -1,6 +1,6 @@
+import { ShareModel } from "../../database/shares/sharesModel";
 import { UserModel } from "../../database/users/usersModel";
 import { Symbol } from "../api/Symbol";
-import { ShareModel } from "../../database/shares/sharesModel";
 
 export class UserAction {
 	public static async BuyShares(n: number, sym: string, userId: string): Promise<boolean> {
@@ -15,16 +15,16 @@ export class UserAction {
 		return false;
 	}
 
-	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<false | number> {
+	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
 		const success = await data.user.removeUserCapital({ cost: data.symbolCost * n });
 		if (success) {
 			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
 			await sharesInDb.addShares({ numberOfShares: n });
-			return data.symbolCost;
+			return { success: true, price: data.symbolCost };
 		}
-		return false;
+		return { success: false, price: data.symbolCost };
 	}
 
 	public static async SellShares(n: number, sym: string, userId: string): Promise<boolean> {
