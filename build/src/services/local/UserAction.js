@@ -8,6 +8,7 @@ class UserAction {
      * @deprecated
      */
     static async BuyShares(numOfShares, sym, userId) {
+        numOfShares = Math.abs(numOfShares);
         sym = sym.toUpperCase();
         const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
         const data = { user: promises[0], symbolCost: promises[1] };
@@ -20,6 +21,7 @@ class UserAction {
         return false;
     }
     static async BuySharesReturnSharePrice(toSpend, sym, userId) {
+        toSpend = Math.abs(toSpend);
         sym = sym.toUpperCase();
         const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
         const data = { user: promises[0], symbolCost: promises[1] };
