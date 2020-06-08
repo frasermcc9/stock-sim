@@ -1,6 +1,9 @@
 export declare class UserAction {
-    static BuyShares(n: number, sym: string, userId: string): Promise<boolean>;
-    static BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<{
+    /**
+     * @deprecated
+     */
+    static BuyShares(numOfShares: number, sym: string, userId: string): Promise<boolean>;
+    static BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<{
         success: boolean;
         price: number;
     }>;
