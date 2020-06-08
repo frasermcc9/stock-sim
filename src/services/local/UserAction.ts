@@ -3,25 +3,28 @@ import { UserModel } from "../../database/users/usersModel";
 import { Symbol } from "../api/Symbol";
 
 export class UserAction {
-	public static async BuyShares(n: number, sym: string, userId: string): Promise<boolean> {
+	/**
+	 * @deprecated
+	 */
+	public static async BuyShares(numOfShares: number, sym: string, userId: string): Promise<boolean> {
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
-		const success = await data.user.removeUserCapital({ cost: data.symbolCost * n });
+		const success = await data.user.removeUserCapital({ cost: data.symbolCost * numOfShares });
 		if (success) {
 			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
-			await sharesInDb.addShares({ numberOfShares: n });
+			await sharesInDb.addShares({ numberOfShares: numOfShares });
 			return true;
 		}
 		return false;
 	}
 
-	public static async BuySharesReturnSharePrice(n: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
+	public static async BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
-		const success = await data.user.removeUserCapital({ cost: data.symbolCost * n });
+		const success = await data.user.removeUserCapital({ cost: toSpend });
 		if (success) {
 			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
-			await sharesInDb.addShares({ numberOfShares: n });
+			await sharesInDb.addShares({ numberOfShares: toSpend / data.symbolCost });
 			return { success: true, price: data.symbolCost };
 		}
 		return { success: false, price: data.symbolCost };
