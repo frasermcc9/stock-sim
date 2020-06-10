@@ -41,9 +41,9 @@ class UserAction {
         if (success) {
             const user = await usersModel_1.UserModel.findOneOrCreate({ uId: userId });
             await user.addUserCapital({ amountToAdd: n * data.symbolCost });
-            return true;
+            return { success: true, price: data.symbolCost };
         }
-        return false;
+        return { success: false, price: data.symbolCost };
     }
     static async SellAllShares(sym, userId) {
         sym = sym.toUpperCase();
