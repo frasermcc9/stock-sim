@@ -91,6 +91,9 @@ class UserAction {
         });
         return value;
     }
+    async FreeCapital() {
+        return (await usersModel_1.UserModel.findOneOrCreate({ uId: this.userId })).capital;
+    }
 }
 exports.UserAction = UserAction;
 //# sourceMappingURL=UserAction.js.map

@@ -24,6 +24,7 @@ export declare class UserAction {
      * Must SetCache() before use
      */
     NetAssetWorth(): number;
+    FreeCapital(): Promise<number>;
 }
 interface ITradeShares {
     success: boolean;
