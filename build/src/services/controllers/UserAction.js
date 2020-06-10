@@ -4,52 +4,41 @@ const sharesModel_1 = require("../../database/shares/sharesModel");
 const usersModel_1 = require("../../database/users/usersModel");
 const Symbol_1 = require("../api/Symbol");
 class UserAction {
-    /**
-     * @deprecated
-     */
-    static async BuyShares(numOfShares, sym, userId) {
-        numOfShares = Math.abs(numOfShares);
-        sym = sym.toUpperCase();
-        const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
-        const data = { user: promises[0], symbolCost: promises[1] };
-        const success = await data.user.removeUserCapital({ cost: data.symbolCost * numOfShares });
-        if (success) {
-            const sharesInDb = await sharesModel_1.ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
-            await sharesInDb.addShares({ numberOfShares: numOfShares });
-            return true;
-        }
-        return false;
+    constructor(userId) {
+        this.stockCache = new Map();
+        this.holdingsCache = new Map();
+        this.userId = userId;
     }
-    static async BuySharesReturnSharePrice(toSpend, sym, userId) {
+    async BuySharesReturnSharePrice(toSpend, sym) {
         toSpend = Math.abs(toSpend);
         sym = sym.toUpperCase();
-        const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
+        const promises = await Promise.all([usersModel_1.UserModel.findOneOrCreate({ uId: this.userId }), new Symbol_1.Symbol(sym).CurrentPrice()]);
         const data = { user: promises[0], symbolCost: promises[1] };
         const success = await data.user.removeUserCapital({ cost: toSpend });
         if (success) {
-            const sharesInDb = await sharesModel_1.ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
+            const sharesInDb = await sharesModel_1.ShareModel.findOneOrCreate({ symbol: sym, uId: this.userId });
             await sharesInDb.addShares({ numberOfShares: toSpend / data.symbolCost });
             return { success: true, price: data.symbolCost };
         }
         return { success: false, price: data.symbolCost };
     }
-    static async SellShares(n, sym, userId) {
+    async SellShares(n, sym) {
         sym = sym.toUpperCase();
-        const promises = await Promise.all([sharesModel_1.ShareModel.findOneOrCreate({ uId: userId, symbol: sym }), new Symbol_1.Symbol(sym).CurrentPrice()]);
+        const promises = await Promise.all([sharesModel_1.ShareModel.findOneOrCreate({ uId: this.userId, symbol: sym }), new Symbol_1.Symbol(sym).CurrentPrice()]);
         const data = { shareData: promises[0], symbolCost: promises[1] };
         const success = await data.shareData.sellShares({ numberOfShares: n });
         if (success) {
-            const user = await usersModel_1.UserModel.findOneOrCreate({ uId: userId });
+            const user = await usersModel_1.UserModel.findOneOrCreate({ uId: this.userId });
             await user.addUserCapital({ amountToAdd: n * data.symbolCost });
             return { success: true, price: data.symbolCost };
         }
         return { success: false, price: data.symbolCost };
     }
-    static async SellAllShares(sym, userId) {
+    async SellAllShares(sym) {
         sym = sym.toUpperCase();
-        const shareDoc = await sharesModel_1.ShareModel.findOneOrCreate({ uId: userId, symbol: sym });
+        const shareDoc = await sharesModel_1.ShareModel.findOneOrCreate({ uId: this.userId, symbol: sym });
         const shareNum = shareDoc.shares;
-        const sellObject = await this.SellShares(shareNum, sym, userId);
+        const sellObject = await this.SellShares(shareNum, sym);
         const returnObject = {
             success: sellObject.success,
             price: sellObject.price,
@@ -57,11 +46,31 @@ class UserAction {
         };
         return returnObject;
     }
-    static async SymbolValueMapFromId(userId) {
-        const records = await sharesModel_1.ShareModel.allHeldByUser({ uId: userId });
-        return this.SymbolValueMap(records);
+    async CacheMarketValues() {
+        const records = await sharesModel_1.ShareModel.allHeldByUser({ uId: this.userId });
+        records.forEach(async (el) => {
+            this.holdingsCache.set(el.symbol, el.shares);
+        });
+        this.stockCache = await UserAction.SymbolValueMapFromDocument(records);
+        return new Map(this.stockCache);
     }
-    static async SymbolValueMap(records) {
+    /**
+     * Refreshes both caches
+     */
+    async RefreshUserCache() {
+        return this.CacheMarketValues();
+    }
+    /**
+     * alias for the RefreshUserCache() command
+     */
+    async SetUserCache() {
+        return this.CacheMarketValues();
+    }
+    /**
+     * Returns a map of symbols and their market prices. Uses iex API.
+     * @param records
+     */
+    static async SymbolValueMapFromDocument(records) {
         const SymbolValue = new Map();
         records.forEach(async (shareDoc) => {
             const s = new Symbol_1.Symbol(shareDoc.symbol);
@@ -69,12 +78,16 @@ class UserAction {
         });
         return SymbolValue;
     }
-    static async NetAssetWorth(userId) {
-        const records = await sharesModel_1.ShareModel.allHeldByUser({ uId: userId });
+    /**
+     * Must SetCache() before use
+     */
+    NetAssetWorth() {
         let value = 0;
-        records.forEach(async (shareDoc) => {
-            const s = new Symbol_1.Symbol(shareDoc.symbol);
-            value += await s.CurrentPrice();
+        this.holdingsCache.forEach((shares, holding) => {
+            const marketValue = this.stockCache.get(holding);
+            if (marketValue == undefined)
+                throw new Error("Error: Cache must be set before using NetAssetWorth()");
+            value += marketValue * shares;
         });
         return value;
     }

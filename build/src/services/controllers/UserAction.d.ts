@@ -1,15 +1,29 @@
-import { IShareDocument } from "../../database/shares/sharesTypes";
 export declare class UserAction {
+    private userId;
+    private stockCache;
+    private holdingsCache;
+    constructor(userId: string);
+    BuySharesReturnSharePrice(toSpend: number, sym: string): Promise<ITradeShares>;
+    SellShares(n: number, sym: string): Promise<ITradeShares>;
+    SellAllShares(sym: string): Promise<ISellAllShares>;
+    CacheMarketValues(): Promise<Map<string, number>>;
     /**
-     * @deprecated
+     * Refreshes both caches
      */
-    static BuyShares(numOfShares: number, sym: string, userId: string): Promise<boolean>;
-    static BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<ITradeShares>;
-    static SellShares(n: number, sym: string, userId: string): Promise<ITradeShares>;
-    static SellAllShares(sym: string, userId: string): Promise<ISellAllShares>;
-    static SymbolValueMapFromId(userId: string): Promise<Map<string, number>>;
-    static SymbolValueMap(records: IShareDocument[]): Promise<Map<string, number>>;
-    static NetAssetWorth(userId: string): Promise<number>;
+    RefreshUserCache(): Promise<Map<string, number>>;
+    /**
+     * alias for the RefreshUserCache() command
+     */
+    SetUserCache(): Promise<Map<string, number>>;
+    /**
+     * Returns a map of symbols and their market prices. Uses iex API.
+     * @param records
+     */
+    private static SymbolValueMapFromDocument;
+    /**
+     * Must SetCache() before use
+     */
+    NetAssetWorth(): number;
 }
 interface ITradeShares {
     success: boolean;
