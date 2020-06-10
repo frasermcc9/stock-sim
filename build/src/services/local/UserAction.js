@@ -49,7 +49,13 @@ class UserAction {
         sym = sym.toUpperCase();
         const shareDoc = await sharesModel_1.ShareModel.findOneOrCreate({ uId: userId, symbol: sym });
         const shareNum = shareDoc.shares;
-        return this.SellShares(shareNum, sym, userId);
+        const sellObject = await this.SellShares(shareNum, sym, userId);
+        const returnObject = {
+            success: sellObject.success,
+            price: sellObject.price,
+            holding: shareNum,
+        };
+        return returnObject;
     }
 }
 exports.UserAction = UserAction;
