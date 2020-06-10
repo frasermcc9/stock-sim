@@ -1,6 +1,7 @@
 import { ShareModel } from "../../database/shares/sharesModel";
 import { UserModel } from "../../database/users/usersModel";
 import { Symbol } from "../api/Symbol";
+import { Interface } from "readline";
 
 export class UserAction {
 	/**
@@ -20,7 +21,7 @@ export class UserAction {
 		return false;
 	}
 
-	public static async BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
+	public static async BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<ITradeShares> {
 		toSpend = Math.abs(toSpend);
 		sym = sym.toUpperCase();
 		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
@@ -34,7 +35,7 @@ export class UserAction {
 		return { success: false, price: data.symbolCost };
 	}
 
-	public static async SellShares(n: number, sym: string, userId: string): Promise<{ success: boolean; price: number }> {
+	public static async SellShares(n: number, sym: string, userId: string): Promise<ITradeShares> {
 		sym = sym.toUpperCase();
 		const promises = await Promise.all([ShareModel.findOneOrCreate({ uId: userId, symbol: sym }), new Symbol(sym).CurrentPrice()]);
 		const data = { shareData: promises[0], symbolCost: promises[1] };
@@ -47,10 +48,24 @@ export class UserAction {
 		return { success: false, price: data.symbolCost };
 	}
 
-	public static async SellAllShares(sym: string, userId: string): Promise<{ success: boolean; price: number }> {
+	public static async SellAllShares(sym: string, userId: string): Promise<ISellAllShares> {
 		sym = sym.toUpperCase();
 		const shareDoc = await ShareModel.findOneOrCreate({ uId: userId, symbol: sym });
 		const shareNum = shareDoc.shares;
-		return this.SellShares(shareNum, sym, userId);
+		const sellObject = await this.SellShares(shareNum, sym, userId);
+		const returnObject: ISellAllShares = {
+			success: sellObject.success,
+			price: sellObject.price,
+			holding: shareNum,
+		};
+		return returnObject;
 	}
+}
+
+export interface ITradeShares {
+	success: boolean;
+	price: number;
+}
+export interface ISellAllShares extends ITradeShares {
+	holding: number;
 }
