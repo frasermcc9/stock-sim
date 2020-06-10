@@ -5,7 +5,7 @@ export class Symbol extends BaseService {
 	private _symbol: string;
 	constructor(symbol: string) {
 		super();
-		this._symbol = symbol;
+		this._symbol = symbol.toUpperCase();
 	}
 	public async CurrentPrice(): Promise<number> {
 		return (await this.iex.symbol(this._symbol).quote()).latestPrice;
@@ -18,5 +18,8 @@ export class Symbol extends BaseService {
 	}
 	public async CompanyLogo(): Promise<Logo> {
 		return this.iex.symbol(this._symbol).logo();
+	}
+	public get symbol(): string {
+		return this._symbol;
 	}
 }
