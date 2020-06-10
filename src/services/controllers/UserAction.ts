@@ -79,11 +79,11 @@ export class UserAction {
 	 * @param records
 	 */
 	private static async SymbolValueMapFromDocument(records: IShareDocument[]): Promise<Map<string, number>> {
-		const SymbolValue = new Map<string, number>();
-		records.forEach(async (shareDoc) => {
-			const s = new Symbol(shareDoc.symbol);
+        const SymbolValue = new Map<string, number>();
+        for (const shareDoc of records) {
+            const s = new Symbol(shareDoc.symbol);
 			SymbolValue.set(s.symbol, await s.CurrentPrice());
-		});
+        }
 		return SymbolValue;
 	}
 

@@ -72,10 +72,10 @@ class UserAction {
      */
     static async SymbolValueMapFromDocument(records) {
         const SymbolValue = new Map();
-        records.forEach(async (shareDoc) => {
+        for (const shareDoc of records) {
             const s = new Symbol_1.Symbol(shareDoc.symbol);
             SymbolValue.set(s.symbol, await s.CurrentPrice());
-        });
+        }
         return SymbolValue;
     }
     /**
