@@ -7,5 +7,6 @@ export declare class Symbol extends BaseService {
     FullQuote(): Promise<Quote>;
     CompanyProfile(): Promise<Company>;
     CompanyLogo(): Promise<Logo>;
+    get symbol(): string;
 }
 //# sourceMappingURL=Symbol.d.ts.map

@@ -17,6 +17,7 @@ const ShareSchema = new mongoose_1.Schema({
     },
 });
 ShareSchema.statics.findOneOrCreate = sharesStatics_1.findOneOrCreate;
+ShareSchema.statics.allHeldByUser = sharesStatics_1.allHeldByUser;
 ShareSchema.methods.setLastUpdated = sharesMethods_1.setLastUpdated;
 ShareSchema.methods.sellShares = sharesMethods_1.sellShares;
 ShareSchema.methods.addShares = sharesMethods_1.addShares;

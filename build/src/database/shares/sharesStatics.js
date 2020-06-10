@@ -10,4 +10,12 @@ async function findOneOrCreate({ uId, symbol }) {
     }
 }
 exports.findOneOrCreate = findOneOrCreate;
+async function allHeldByUser({ uId }) {
+    const records = await this.find({ uId: uId });
+    if (records) {
+        return records;
+    }
+    return [];
+}
+exports.allHeldByUser = allHeldByUser;
 //# sourceMappingURL=sharesStatics.js.map

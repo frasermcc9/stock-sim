@@ -4,7 +4,7 @@ const BaseService_1 = require("./BaseService");
 class Crypto extends BaseService_1.BaseService {
     constructor(symbol) {
         super();
-        this._symbol = symbol;
+        this._symbol = symbol.toUpperCase();
     }
     async CurrentPrice() {
         return Number((await this.iex.crypto(this._symbol + "usd").quote()).latestPrice);

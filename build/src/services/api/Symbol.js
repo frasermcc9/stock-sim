@@ -4,7 +4,7 @@ const BaseService_1 = require("./BaseService");
 class Symbol extends BaseService_1.BaseService {
     constructor(symbol) {
         super();
-        this._symbol = symbol;
+        this._symbol = symbol.toUpperCase();
     }
     async CurrentPrice() {
         return (await this.iex.symbol(this._symbol).quote()).latestPrice;
@@ -17,6 +17,9 @@ class Symbol extends BaseService_1.BaseService {
     }
     async CompanyLogo() {
         return this.iex.symbol(this._symbol).logo();
+    }
+    get symbol() {
+        return this._symbol;
     }
 }
 exports.Symbol = Symbol;

@@ -20,5 +20,8 @@ export interface IShareModel extends Model<IShareDocument> {
         symbol: string;
         uId: string;
     }) => Promise<IShareDocument>;
+    allHeldByUser: (this: IShareModel, { uId }: {
+        uId: string;
+    }) => Promise<IShareDocument[]>;
 }
 //# sourceMappingURL=sharesTypes.d.ts.map
