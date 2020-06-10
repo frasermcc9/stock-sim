@@ -99,6 +99,10 @@ export class UserAction {
 		});
 		return value;
 	}
+
+	public async FreeCapital(): Promise<number> {
+		return (await UserModel.findOneOrCreate({ uId: this.userId })).capital;
+	}
 }
 
 interface ITradeShares {
