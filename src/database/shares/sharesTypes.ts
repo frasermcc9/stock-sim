@@ -16,4 +16,5 @@ export interface IShareDocument extends IShare, Document {
 
 export interface IShareModel extends Model<IShareDocument> {
 	findOneOrCreate: (this: IShareModel, { symbol, uId }: { symbol: string; uId: string }) => Promise<IShareDocument>;
+	allHeldByUser: (this: IShareModel, { uId }: { uId: string }) => Promise<IShareDocument[]>;
 }

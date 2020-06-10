@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { findOneOrCreate } from "./sharesStatics";
+import { findOneOrCreate, allHeldByUser } from "./sharesStatics";
 import { setLastUpdated, sellShares, addShares } from "./sharesMethods";
 
 const ShareSchema = new Schema({
@@ -17,6 +17,8 @@ const ShareSchema = new Schema({
 });
 
 ShareSchema.statics.findOneOrCreate = findOneOrCreate;
+ShareSchema.statics.allHeldByUser = allHeldByUser;
+
 ShareSchema.methods.setLastUpdated = setLastUpdated;
 ShareSchema.methods.sellShares = sellShares;
 ShareSchema.methods.addShares = addShares;
