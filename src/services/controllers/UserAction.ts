@@ -5,55 +5,46 @@ import { Interface } from "readline";
 import { IShareDocument } from "../../database/shares/sharesTypes";
 
 export class UserAction {
-	/**
-	 * @deprecated
-	 */
-	public static async BuyShares(numOfShares: number, sym: string, userId: string): Promise<boolean> {
-		numOfShares = Math.abs(numOfShares);
-		sym = sym.toUpperCase();
-		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
-		const data = { user: promises[0], symbolCost: promises[1] };
-		const success = await data.user.removeUserCapital({ cost: data.symbolCost * numOfShares });
-		if (success) {
-			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
-			await sharesInDb.addShares({ numberOfShares: numOfShares });
-			return true;
-		}
-		return false;
+	private userId: string;
+	private stockCache = new Map<string, number>();
+	private holdingsCache = new Map<string, number>();
+
+	constructor(userId: string) {
+		this.userId = userId;
 	}
 
-	public static async BuySharesReturnSharePrice(toSpend: number, sym: string, userId: string): Promise<ITradeShares> {
+	public async BuySharesReturnSharePrice(toSpend: number, sym: string): Promise<ITradeShares> {
 		toSpend = Math.abs(toSpend);
 		sym = sym.toUpperCase();
-		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: userId }), new Symbol(sym).CurrentPrice()]);
+		const promises = await Promise.all([UserModel.findOneOrCreate({ uId: this.userId }), new Symbol(sym).CurrentPrice()]);
 		const data = { user: promises[0], symbolCost: promises[1] };
 		const success = await data.user.removeUserCapital({ cost: toSpend });
 		if (success) {
-			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: userId });
+			const sharesInDb = await ShareModel.findOneOrCreate({ symbol: sym, uId: this.userId });
 			await sharesInDb.addShares({ numberOfShares: toSpend / data.symbolCost });
 			return { success: true, price: data.symbolCost };
 		}
 		return { success: false, price: data.symbolCost };
 	}
 
-	public static async SellShares(n: number, sym: string, userId: string): Promise<ITradeShares> {
+	public async SellShares(n: number, sym: string): Promise<ITradeShares> {
 		sym = sym.toUpperCase();
-		const promises = await Promise.all([ShareModel.findOneOrCreate({ uId: userId, symbol: sym }), new Symbol(sym).CurrentPrice()]);
+		const promises = await Promise.all([ShareModel.findOneOrCreate({ uId: this.userId, symbol: sym }), new Symbol(sym).CurrentPrice()]);
 		const data = { shareData: promises[0], symbolCost: promises[1] };
 		const success = await data.shareData.sellShares({ numberOfShares: n });
 		if (success) {
-			const user = await UserModel.findOneOrCreate({ uId: userId });
+			const user = await UserModel.findOneOrCreate({ uId: this.userId });
 			await user.addUserCapital({ amountToAdd: n * data.symbolCost });
 			return { success: true, price: data.symbolCost };
 		}
 		return { success: false, price: data.symbolCost };
 	}
 
-	public static async SellAllShares(sym: string, userId: string): Promise<ISellAllShares> {
+	public async SellAllShares(sym: string): Promise<ISellAllShares> {
 		sym = sym.toUpperCase();
-		const shareDoc = await ShareModel.findOneOrCreate({ uId: userId, symbol: sym });
+		const shareDoc = await ShareModel.findOneOrCreate({ uId: this.userId, symbol: sym });
 		const shareNum = shareDoc.shares;
-		const sellObject = await this.SellShares(shareNum, sym, userId);
+		const sellObject = await this.SellShares(shareNum, sym);
 		const returnObject: ISellAllShares = {
 			success: sellObject.success,
 			price: sellObject.price,
@@ -62,12 +53,32 @@ export class UserAction {
 		return returnObject;
 	}
 
-	public static async SymbolValueMapFromId(userId: string): Promise<Map<string, number>> {
-		const records = await ShareModel.allHeldByUser({ uId: userId });
-		return this.SymbolValueMap(records);
+	public async CacheMarketValues(): Promise<Map<string, number>> {
+		const records = await ShareModel.allHeldByUser({ uId: this.userId });
+		records.forEach(async (el) => {
+			this.holdingsCache.set(el.symbol, el.shares);
+		});
+		this.stockCache = await UserAction.SymbolValueMapFromDocument(records);
+		return new Map(this.stockCache);
+	}
+	/**
+	 * Refreshes both caches
+	 */
+	public async RefreshUserCache(): Promise<Map<string, number>> {
+		return this.CacheMarketValues();
+	}
+	/**
+	 * alias for the RefreshUserCache() command
+	 */
+	public async SetUserCache(): Promise<Map<string, number>> {
+		return this.CacheMarketValues();
 	}
 
-	public static async SymbolValueMap(records: IShareDocument[]): Promise<Map<string, number>> {
+	/**
+	 * Returns a map of symbols and their market prices. Uses iex API.
+	 * @param records
+	 */
+	private static async SymbolValueMapFromDocument(records: IShareDocument[]): Promise<Map<string, number>> {
 		const SymbolValue = new Map<string, number>();
 		records.forEach(async (shareDoc) => {
 			const s = new Symbol(shareDoc.symbol);
@@ -76,12 +87,15 @@ export class UserAction {
 		return SymbolValue;
 	}
 
-	public static async NetAssetWorth(userId: string): Promise<number> {
-		const records = await ShareModel.allHeldByUser({ uId: userId });
+	/**
+	 * Must SetCache() before use
+	 */
+	public NetAssetWorth(): number {
 		let value = 0;
-		records.forEach(async (shareDoc) => {
-			const s = new Symbol(shareDoc.symbol);
-			value += await s.CurrentPrice();
+		this.holdingsCache.forEach((shares, holding) => {
+			const marketValue = this.stockCache.get(holding);
+			if (marketValue == undefined) throw new Error("Error: Cache must be set before using NetAssetWorth()");
+			value += marketValue * shares;
 		});
 		return value;
 	}
