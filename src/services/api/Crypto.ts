@@ -6,14 +6,13 @@ export class Crypto extends BaseService {
 
 	constructor(symbol: string) {
 		super();
-		this._symbol = symbol;
+		this._symbol = symbol.toUpperCase();
 	}
 
 	public async CurrentPrice(): Promise<number> {
-		return Number((await this.iex.crypto(this._symbol+"usd").quote()).latestPrice);
+		return Number((await this.iex.crypto(this._symbol + "usd").quote()).latestPrice);
 	}
 	public async FullQuote(): Promise<CryptoQuote> {
 		return this.iex.crypto(this._symbol).quote();
 	}
-
 }
