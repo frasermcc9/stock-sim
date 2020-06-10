@@ -2,6 +2,7 @@ import { ShareModel } from "../../database/shares/sharesModel";
 import { UserModel } from "../../database/users/usersModel";
 import { Symbol } from "../api/Symbol";
 import { Interface } from "readline";
+import { IShareDocument } from "../../database/shares/sharesTypes";
 
 export class UserAction {
 	/**
@@ -60,12 +61,36 @@ export class UserAction {
 		};
 		return returnObject;
 	}
+
+	public static async SymbolValueMapFromId(userId: string): Promise<Map<string, number>> {
+		const records = await ShareModel.allHeldByUser({ uId: userId });
+		return this.SymbolValueMap(records);
+	}
+
+	public static async SymbolValueMap(records: IShareDocument[]): Promise<Map<string, number>> {
+		const SymbolValue = new Map<string, number>();
+		records.forEach(async (shareDoc) => {
+			const s = new Symbol(shareDoc.symbol);
+			SymbolValue.set(s.symbol, await s.CurrentPrice());
+		});
+		return SymbolValue;
+	}
+
+	public static async NetAssetWorth(userId: string): Promise<number> {
+		const records = await ShareModel.allHeldByUser({ uId: userId });
+		let value = 0;
+		records.forEach(async (shareDoc) => {
+			const s = new Symbol(shareDoc.symbol);
+			value += await s.CurrentPrice();
+		});
+		return value;
+	}
 }
 
-export interface ITradeShares {
+interface ITradeShares {
 	success: boolean;
 	price: number;
 }
-export interface ISellAllShares extends ITradeShares {
+interface ISellAllShares extends ITradeShares {
 	holding: number;
 }
