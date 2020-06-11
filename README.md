@@ -6,7 +6,7 @@ This is a simple application that creates a back-end system for a stock-market s
 
 ## Installation
 
-```
+```bash
 $   npm install https://github.com/frasermcc9/stock-sim
 ```
 
